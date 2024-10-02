@@ -45,7 +45,8 @@ export default function UrlIntoSelection(editor: Editor, cb: string | ClipboardE
   if ((selectedText === "") && settings.nothingSelected === NothingSelected.insertInline) {
     editor.setCursor({ ch: replaceRange.from.ch + 1, line: replaceRange.from.line });
   } else {
-    editor.setCursor({ ch: editor.getCursor().ch + replaceText.length, line: editor.getCursor().line });
+    const replace_end = Math.min(editor.getCursor().ch + replaceText.length, editor.getLine(editor.getCursor().line).length);
+    editor.setCursor({ ch: replace_end, line: editor.getCursor().line });
   }
 }
 
