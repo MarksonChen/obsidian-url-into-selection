@@ -6,6 +6,8 @@ export const enum NothingSelected {
   doNothing,
   /** Automatically select word surrounding the cursor */
   autoSelect,
+  /** Automatically select word surrounding the cursor */
+  autoSelectOrInsertText,
   /** Insert `[](url)` */
   insertInline,
   /** Insert `<url>` */
@@ -16,12 +18,14 @@ export interface PluginSettings {
   regex: string;
   nothingSelected: NothingSelected;
   listForImgEmbed: string;
+  linkText: string;
 }
 
 export const DEFAULT_SETTINGS: PluginSettings = {
   regex: /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
     .source,
   nothingSelected: NothingSelected.doNothing,
+  linkText: "url",
   listForImgEmbed: "",
 };
 
@@ -56,8 +60,9 @@ export class UrlIntoSelectionSettingsTab extends PluginSettingTab {
         const options: Record<NothingSelected, string> = {
           0: "Do nothing",
           1: "Auto Select",
-          2: "Insert [](url)",
-          3: "Insert <url>",
+          2: "Auto Select or Insert [...](url)",
+          3: "Insert [](url)",
+          4: "Insert <url>",
         };
 
         dropdown
@@ -69,6 +74,23 @@ export class UrlIntoSelectionSettingsTab extends PluginSettingTab {
             this.display();
           });
       });
+
+      new Setting(containerEl)
+        .setName("text to insert with URL")
+        .setDesc(
+          "text inserted with URL when nothing is selected."
+        )
+        .addText((text) =>
+          text
+            .setPlaceholder("Enter text here..")
+            .setValue(plugin.settings.linkText)
+            .onChange(async (value) => {
+              if (value.length > 0) {
+                plugin.settings.linkText = value;
+                await plugin.saveSettings();
+              }
+            })
+        );
     new Setting(containerEl)
       .setName("Whitelist for image embed syntax")
       .setDesc(

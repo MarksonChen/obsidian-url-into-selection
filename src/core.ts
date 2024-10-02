@@ -56,6 +56,7 @@ function getSelnRange(editor: Editor, settings: PluginSettings) {
     replaceRange = null;
   } else {
     switch (settings.nothingSelected) {
+      case NothingSelected.autoSelectOrInsertText:
       case NothingSelected.autoSelect:
         replaceRange = getWordBoundaries(editor, settings);
         selectedText = editor.getRange(replaceRange.from, replaceRange.to);
@@ -112,12 +113,17 @@ function getReplaceText(clipboardText: string, selectedText: string, settings: P
   let linktext: string;
   let url: string;
 
+  if (selectedText === "" && settings.nothingSelected === NothingSelected.autoSelectOrInsertText) {
+    selectedText = settings.linkText;
+  }
+
   if (isUrl(clipboardText, settings)) {
     linktext = selectedText;
     url = clipboardText;
   } else if (isUrl(selectedText, settings)) {
-    linktext = clipboardText;
-    url = selectedText;
+    // linktext = clipboardText;
+    // url = selectedText;
+    return null;  // We ignore this case 
   } else return null; // if neither of two is an URL, the following code would be skipped.
 
   const imgEmbedMark = isImgEmbed(clipboardText, settings) ? "!" : "";
