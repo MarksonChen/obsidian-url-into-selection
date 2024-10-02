@@ -31,7 +31,8 @@ export default function UrlIntoSelection(editor: Editor, cb: string | ClipboardE
   }
 
   const clipboardText = getCbText(cb);
-  if (clipboardText === null) return;
+  if (clipboardText === null || !isUrl(clipboardText, settings)) return;
+  console.log("clipboardText is URL: %s, %s", isUrl(clipboardText, settings), clipboardText);
 
   const { selectedText, replaceRange } = getSelnRange(editor, settings);
   const replaceText = getReplaceText(clipboardText, selectedText, settings);
@@ -44,6 +45,8 @@ export default function UrlIntoSelection(editor: Editor, cb: string | ClipboardE
   // if nothing is selected and the nothing selected behavior is to insert [](url) place the cursor between the square brackets
   if ((selectedText === "") && settings.nothingSelected === NothingSelected.insertInline) {
     editor.setCursor({ ch: replaceRange.from.ch + 1, line: replaceRange.from.line });
+  } else {
+    editor.setCursor({ ch: editor.getLine(editor.getCursor().line).length, line: replaceRange.from.line });
   }
 }
 
@@ -113,8 +116,9 @@ function getReplaceText(clipboardText: string, selectedText: string, settings: P
   let linktext: string;
   let url: string;
 
-  if (selectedText === "" && settings.nothingSelected === NothingSelected.autoSelectOrInsertText) {
+  if (selectedText.trim() === "" && settings.nothingSelected === NothingSelected.autoSelectOrInsertText) {
     selectedText = settings.linkText;
+    console.log("selectedText is empty, using default link text {}", selectedText);
   }
 
   if (isUrl(clipboardText, settings)) {
@@ -197,18 +201,20 @@ const findWordAt = (() => {
     let check;
     let start = pos.ch;
     let end = pos.ch;
-    (end === line.length) ? --start : ++end;
-    const startChar = line.charAt(pos.ch);
-    if (isWordChar(startChar)) {
-      check = (ch: string) => isWordChar(ch);
-    } else if (/\s/.test(startChar)) {
-      check = (ch: string) => /\s/.test(ch);
-    } else {
-      check = (ch: string) => (!/\s/.test(ch) && !isWordChar(ch));
-    }
+    // (end === line.length) ? --start : ++end;
+    if (end != line.length){
+      const startChar = line.charAt(pos.ch);
+      if (isWordChar(startChar)) {
+        check = (ch: string) => isWordChar(ch);
+      } else if (/\s/.test(startChar)) {
+        check = (ch: string) => /\s/.test(ch);
+      } else {
+        check = (ch: string) => (!/\s/.test(ch) && !isWordChar(ch));
+      }
 
-    while (start > 0 && check(line.charAt(start - 1))) --start;
-    while (end < line.length && check(line.charAt(end))) ++end;
+      while (start > 0 && check(line.charAt(start - 1))) --start;
+      while (end < line.length && check(line.charAt(end))) ++end;
+    }
     return { from: { line: pos.line, ch: start }, to: { line: pos.line, ch: end } };
   };
 })();

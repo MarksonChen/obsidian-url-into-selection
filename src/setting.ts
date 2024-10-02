@@ -78,7 +78,7 @@ export class UrlIntoSelectionSettingsTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("text to insert with URL")
         .setDesc(
-          "text inserted with URL when nothing is selected."
+          "text for inserting [...](url) when nothing is selected."
         )
         .addText((text) =>
           text
