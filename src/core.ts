@@ -32,7 +32,6 @@ export default function UrlIntoSelection(editor: Editor, cb: string | ClipboardE
 
   const clipboardText = getCbText(cb);
   if (clipboardText === null || !isUrl(clipboardText, settings)) return;
-  console.log("clipboardText is URL: %s, %s", isUrl(clipboardText, settings), clipboardText);
 
   const { selectedText, replaceRange } = getSelnRange(editor, settings);
   const replaceText = getReplaceText(clipboardText, selectedText, settings);
@@ -46,7 +45,7 @@ export default function UrlIntoSelection(editor: Editor, cb: string | ClipboardE
   if ((selectedText === "") && settings.nothingSelected === NothingSelected.insertInline) {
     editor.setCursor({ ch: replaceRange.from.ch + 1, line: replaceRange.from.line });
   } else {
-    editor.setCursor({ ch: editor.getLine(editor.getCursor().line).length, line: replaceRange.from.line });
+    editor.setCursor({ ch: editor.getCursor().ch + replaceText.length, line: editor.getCursor().line });
   }
 }
 
@@ -64,6 +63,7 @@ function getSelnRange(editor: Editor, settings: PluginSettings) {
         replaceRange = getWordBoundaries(editor, settings);
         selectedText = editor.getRange(replaceRange.from, replaceRange.to);
         break;
+      case NothingSelected.insertText:
       case NothingSelected.insertInline:
       case NothingSelected.insertBare:
         replaceRange = getCursor(editor);
@@ -116,9 +116,10 @@ function getReplaceText(clipboardText: string, selectedText: string, settings: P
   let linktext: string;
   let url: string;
 
-  if (selectedText.trim() === "" && settings.nothingSelected === NothingSelected.autoSelectOrInsertText) {
+  if (selectedText.trim() === "" && (settings.nothingSelected === NothingSelected.autoSelectOrInsertText
+    || settings.nothingSelected === NothingSelected.insertText
+  )) {
     selectedText = settings.linkText;
-    console.log("selectedText is empty, using default link text {}", selectedText);
   }
 
   if (isUrl(clipboardText, settings)) {

@@ -6,8 +6,10 @@ export const enum NothingSelected {
   doNothing,
   /** Automatically select word surrounding the cursor */
   autoSelect,
-  /** Automatically select word surrounding the cursor */
+  /** Insert [settings.linkText](url) when there's nothing to auto select */
   autoSelectOrInsertText,
+  /** Insert [settings.linkText](url)  */
+  insertText,
   /** Insert `[](url)` */
   insertInline,
   /** Insert `<url>` */
@@ -22,8 +24,8 @@ export interface PluginSettings {
 }
 
 export const DEFAULT_SETTINGS: PluginSettings = {
-  regex: /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
-    .source,
+  
+  regex: "^(https:\\/\\/www\\.|http:\\/\\/www\\.|https:\\/\\/|http:\\/\\/)?[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})(\\.[a-zA-Z0-9]{2,})?",
   nothingSelected: NothingSelected.doNothing,
   linkText: "url",
   listForImgEmbed: "",
@@ -61,8 +63,9 @@ export class UrlIntoSelectionSettingsTab extends PluginSettingTab {
           0: "Do nothing",
           1: "Auto Select",
           2: "Auto Select or Insert [...](url)",
-          3: "Insert [](url)",
-          4: "Insert <url>",
+          3: "Insert [...](url)",
+          4: "Insert [](url)",
+          5: "Insert <url>",
         };
 
         dropdown
