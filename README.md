@@ -1,21 +1,11 @@
-# Paste URL into selection
+### Changes from [denolehov/obsidian-url-into-selection](https://github.com/denolehov/obsidian-url-into-selection):
 
-Insert links (URLs) into a selected text "notion-style" using regular `Ctrl/Cmd + V`
+1. Removed the functionality "Pasting text into url replaces 'url' into '\[text\](url)'"
 
-Also works the other way around, inserts text into a selected link (URL) by command palette/hotkey(need to be set manually)
+2. Added a new setting, "Insert \[...\](url)": When no text is selected, it pastes the link as \[linkText\](url), where `linkText` is a custom text that can be set in settings.
 
-## Demo
-![example](https://user-images.githubusercontent.com/4748206/98997874-ed55fb80-253d-11eb-9121-709a316a4d1e.gif)
+3. Added a new setting, "Auto Select or Insert \[...\](url)": When the cursor is not inside a text, it pastes the link as \[linkText\](url), where `linkText` is a custom text that can be set in settings.
 
-## Compatibility
-Custom plugins are only available for Obsidian v0.9.8+.
+4. Replace the default regex for link to `^(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})(\.[a-zA-Z0-9]{2,})?`, which only checks for "strings that start with a domain extension" and no longer checks for "all strings containing a link". 
 
-# Installation
-In order to install this plugin, go to "Settings > Third Party Plugins > Paste URL into selection".
-
-
-If you have any kind of feedback or questions, feel free to reach out via GitHub issues or `@evrwhr` on [Obsidian Discord server](https://discord.com/invite/veuWUTm).
-
----
-
-> If you like what I do, you could consider buying me a coffee. It is unnecessary, but appreciated :) https://www.buymeacoffee.com/evrwhr
+5. Moves cursor to the end of the \[...\](url) when pasted
